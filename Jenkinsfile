@@ -2,10 +2,7 @@ pipeline {
     agent any
 
     environment {
-        IMAGE_NAME = "my-python-app"
-        // Make sure your DISPLAY environment variable is set on your Jenkins agent host.
-        // For example, if you're logged into a desktop session on your VM, it might be :0
-        DISPLAY_VAR = "${env.DISPLAY ?: ':0'}"
+        IMAGE_NAME = "tic-tac-toe"
     }
 
     stages {
@@ -19,21 +16,18 @@ pipeline {
             steps {
                 script {
                     echo "Building Docker image..."
-                    // Build the Docker image. The tag is based on the build ID.
                     dockerImage = docker.build("${IMAGE_NAME}:${env.BUILD_ID}")
                 }
             }
         }
-        stage('Run Container (with X11 Forwarding)') {
+        stage('Simulate Game') {
             steps {
                 script {
-                    echo "Running container with GUI support..."
-                    // Using dockerImage.inside with additional docker run arguments.
-                    // Here we pass the DISPLAY variable and mount the X11 socket.
-                    dockerImage.inside("-e DISPLAY=${DISPLAY_VAR} -v /tmp/.X11-unix:/tmp/.X11-unix") {
-                        // Run the Python script inside the container.
-                        // Your Dockerfile's CMD may already do this, but here we're explicitly calling it.
-                        sh 'python script.py'
+                    echo "Running Tic Tac Toe simulation inside container..."
+                    // Simulate a game by piping predefined moves into the Python script.
+                    dockerImage.inside {
+                        // Note: Adjust the moves if desired. Here they simulate moves for all 9 positions.
+                        sh 'echo -e "1\\n2\\n3\\n4\\n5\\n6\\n7\\n8\\n9" | python tic_tac_toe.py'
                     }
                 }
             }
@@ -43,6 +37,12 @@ pipeline {
         always {
             echo "Cleaning up workspace..."
             cleanWs()
+        }
+        success {
+            echo "Pipeline completed successfully!"
+        }
+        failure {
+            echo "Pipeline failed. Please check the logs."
         }
     }
 }

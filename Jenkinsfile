@@ -37,9 +37,9 @@ pipeline {
             }
         }
         stage('Deploy') {
-            when {
-                branch 'main'  // Only deploy on the main branch
-            }
+            //when {
+                //branch 'main'  // Only deploy on the main branch
+            //}
             steps {
                 script {
                     echo "Deploying Docker container..."

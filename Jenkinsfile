@@ -15,6 +15,12 @@ pipeline {
                 checkout scm
             }
         }
+        stage('Debug Info') {
+	    steps {
+		echo "BRANCH_NAME: ${env.BRANCH_NAME}"
+		echo "GIT_BRANCH: ${env.GIT_BRANCH}"
+	    }
+	}
         stage('Build Docker Image') {
             steps {
                 script {
